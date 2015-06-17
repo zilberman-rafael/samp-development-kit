@@ -47,8 +47,15 @@ Functions:
 	Static:
 		-
 	Inline:
-		Bit_Cells - Gets the number of cells required for a bit array.
-		Bit_Size - Gets the size of the bit array.
+		Bit_Cells(size) - Gets the number of cells required for a bit array.
+		Bit_Slot(value) - Gets the array slot for this value.
+		Bit_Size(Bit:array[]) - Gets the size of the bit array.
+		Bit_Get(Bit:array[], slot) - Gets a slot state.
+		Bit_Set(Bit:array[], slot, bool:state) - Sets a slot to the given value.
+		Bit_SetAll(Bit:array[], bool:state) - Sets all the slots in an array to the same thing.
+		Bit_On(Bit:array[], slot)  - Sets a slot to 1.
+		Bit_Off(Bit:array[], slot)  - Sets a slot to 0.
+		Bit_Count(Bit:array[]) - Gets the number of 1s in a bit array.
 	API:
 		-
 Callbacks:
@@ -60,7 +67,7 @@ Enums:
 Macros:
 	-
 Tags:
-	Bit - Bit array type.
+	BitArray - Bit array type.
 Variables:
 	Global:
 		-
@@ -168,13 +175,24 @@ Compile options:
 </returns>
 <remarks>
 	-
-
-native Bit_Set(BitArray:array<>, slot, bool:state);
-
 </remarks>
 \**--------------------------------------------------------------------------**/
 
 #define Bit_Set(%0,%1,%2) ((%2)?(Bit_On(%0,(%1))):(Bit_Of(%0,(%1))))
+
+/**--------------------------------------------------------------------------**\
+<summary>Bit_SetAll</summary>
+<param name="Bit:array[]">Array to set all values of.</param>
+<param name="bool:state">Wether to set them all 0 or 1.</param>
+<returns>
+	-
+</returns>
+<remarks>
+	-
+</remarks>
+\**--------------------------------------------------------------------------**/
+
+#define Bit_SetAll(%1,%2) (memset(_:%1, ((%2) ? (0xFFFFFFFF) : (0x0)), size))
 
 /**--------------------------------------------------------------------------**\
 <summary>Bit_On</summary>
@@ -205,21 +223,6 @@ native Bit_Set(BitArray:array<>, slot, bool:state);
 #define Bit_Off(%1,%2) %1[Bit_Slot(%2)]&=Bit:~(1<<((%2)&cellbits-1))
 
 /**--------------------------------------------------------------------------**\
-<summary>Bit_SetAll</summary>
-<param name="Bit:array[]">Array to set all values of.</param>
-<param name="bool:state">Wether to set them all 0 or 1.</param>
-<returns>
-	-
-</returns>
-<remarks>
-	-
-
-native Bit_SetAll(BitArray:array<>, bool:state);
-
-</remarks>
-\**--------------------------------------------------------------------------**/
-
-#define Bit_SetAll(%1,%2) (memset(_:%1, ((%2) ? (0xFFFFFFFF) : (0x0)), size))/**--------------------------------------------------------------------------**\
 <summary>Bit_Count</summary>
 <param name="Bit:array[]">Array to count.</param>
 <param name="size">Size of array.</param>
@@ -229,20 +232,23 @@ native Bit_SetAll(BitArray:array<>, bool:state);
 <remarks>
 	Code from:
 	http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
-
-native Bit_Count(Bit:array[], bool:state = true);
-
 </remarks>
 \**--------------------------------------------------------------------------**/
 
-stock Bit_Count(Bit:array[], bool:state = true)
+stock Bit_Count(Bit:array[])
 {
 	new
 		count,
 		size = Bit_Size(array);
 	for (new rl@bitarray@@itter = 0; rl@bitarray@@itter < size; i++)
 	{
-		count += array[Bit_Slot(i)];
+		array[Bit_Slot(rl@bitarray@@itter)] -= ((array[Bit_Slot(rl@bitarray@@itter)] >>> 1) & 0x55555555);
+		array[Bit_Slot(rl@bitarray@@itter)] = (array[Bit_Slot(rl@bitarray@@itter)] & 0x33333333) + ((array[Bit_Slot(i)] >>> 2) & 0x33333333);
+		count += (((array[Bit_Slot(rl@bitarray@@itter)] + (array[Bit_Slot(rl@bitarray@@itter)] >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
 	}
-	return abs((!state)*size - count);
+	return count;
 }
+
+/*
+ */
+#define BitArray:%1[%2] Bit:%1[Bit_Cells(%2)]
