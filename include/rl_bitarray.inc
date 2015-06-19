@@ -47,15 +47,22 @@ Functions:
 	Static:
 		-
 	Inline:
-		Bit_Cells(size) - Gets the number of cells required for a bit array.
-		Bit_Slot(value) - Gets the array slot for this value.
-		Bit_Size(Bit:array[]) - Gets the size of the bit array.
-		Bit_Get(Bit:array[], slot) - Gets a slot state.
-		Bit_Set(Bit:array[], slot, bool:state) - Sets a slot to the given value.
-		Bit_SetAll(Bit:array[], bool:state) - Sets all the slots in an array to the same thing.
-		Bit_On(Bit:array[], slot)  - Sets a slot to 1.
-		Bit_Off(Bit:array[], slot)  - Sets a slot to 0.
-		Bit_Count(Bit:array[]) - Gets the number of 1s in a bit array.
+		Bit_Get(Bit:variable, slot) - Gets a slot state.
+		Bit_Set(Bit:variable, slot, bool:state) - Sets a slot to the given value.
+		Bit_SetAll(Bit:variable, bool:state) - Sets all the slots in an variable to the same thing.
+		Bit_On(Bit:variable, slot)  - Sets a slot to 1.
+		Bit_Off(Bit:variable, slot)  - Sets a slot to 0.
+		Bit_Toggle(Bit:variable, slot) - Toggles a slot (1 to 0 and 0 to 1)
+		BitArray_Cells(size) - Gets the number of cells required for a bit array.
+		BitArray_Slot(value) - Gets the array slot for this value.
+		BitArray_Size(Bit:array[]) - Gets the size of the bit array.
+		BitArray_Get(Bit:array[], slot) - Gets a slot state.
+		BitArray_Set(Bit:array[], slot, bool:state) - Sets a slot to the given value.
+		BitArray_SetAll(Bit:array[], bool:state) - Sets all the slots in an array to the same thing.
+		BitArray_On(Bit:array[], slot)  - Sets a slot to 1.
+		BitArray_Off(Bit:array[], slot)  - Sets a slot to 0.
+		BitArray_Toggle((Bit:array[], slot) - Toggles a slot (1 to 0 and 0 to 1)
+		BitArray_Count(Bit:array[]) - Gets the number of 1s in a bit array.
 	API:
 		-
 Callbacks:
@@ -113,7 +120,92 @@ Compile options:
 #endif
 
 /**--------------------------------------------------------------------------**\
-<summary>Bit_Cells</summary>
+<summary>Bit_Get</summary>
+<param name="Bit:variable">Bits conteiner.</param>
+<param name="slot">Bit slot.</param>
+<returns>
+	State of the provided slot
+</returns>
+<remarks>
+	Unsafe, make sure you're within range.
+</remarks>
+\**--------------------------------------------------------------------------**/
+
+#define Bit_Get(%1,%2) ((%1) & Bit(1<<%2))
+
+/**--------------------------------------------------------------------------**\
+<summary>Bit_Set</summary>
+<param name="Bit:variable">Bits conteiner.</param>
+<param name="slot">Bit slot.</param>
+<param name="bool:state">State to set the slot to.</param>
+<returns>
+	-
+</returns>
+<remarks>
+	-
+</remarks>
+\**--------------------------------------------------------------------------**/
+
+#define Bit_Set(%1,%2,%3) (%1 ^= Bit:((-%3^%1)&(1<<%2))))
+
+/**--------------------------------------------------------------------------**\
+<summary>Bit_SetAll</summary>
+<param name="Bit:variable">Bits conteiner.</param>
+<param name="bool:state">Wether to set them all 0 or 1.</param>
+<returns>
+	-
+</returns>
+<remarks>
+	-
+</remarks>
+\**--------------------------------------------------------------------------**/
+
+#define Bit_SetAll(%1,%2) (%1 = ((%2)?(0xFFFFFFFF):(0x0)))
+
+/**--------------------------------------------------------------------------**\
+<summary>Bit_On</summary>
+<param name="Bit:variable">Bits conteiner.</param>
+<param name="slot">Bit slot.</param>
+<returns>
+	-
+</returns>
+<remarks>
+	Sets the slot to 1.
+</remarks>
+\**--------------------------------------------------------------------------**/
+
+#define Bit_On(%1,%2) (%1 |= Bit:(1<<(%2)))
+
+/**--------------------------------------------------------------------------**\
+<summary>Bit_Off</summary>
+<param name="Bit:variable">Bits conteiner.</param>
+<param name="slot">Bit slot.</param>
+<returns>
+	-
+</returns>
+<remarks>
+	Sets the slot to 0.
+</remarks>
+\**--------------------------------------------------------------------------**/
+
+#define Bit_Off(%1,%2) (%1 &= Bit:~(1<<(%2))
+
+/**--------------------------------------------------------------------------**\
+<summary>Bit_On</summary>
+<param name="Bit:variable">Bits conteiner.</param>
+<param name="slot">Bit slot.</param>
+<returns>
+	-
+</returns>
+<remarks>
+	Sets the slot to 1.
+</remarks>
+\**--------------------------------------------------------------------------**/
+
+#define Bit_Toggle(%1,%2) (%1 ^= Bit:(1<<(%2)))
+
+/**--------------------------------------------------------------------------**\
+<summary>BitArray_Cells</summary>
 <param name="size">Number of bits required.</param>
 <returns>
 	Number of cells required for the bit array.
@@ -123,10 +215,10 @@ Compile options:
 </remarks>
 \**--------------------------------------------------------------------------**/
 
-#define Bit_Cells(%1) (((%1)+cellbits-1)/cellbits)
+#define BitArray_Cells(%1) (((%1)+cellbits-1)/cellbits)
 
 /**--------------------------------------------------------------------------**\
-<summary>Bit_Slot</summary>
+<summary>BitArray_Slot</summary>
 <param name="value">Value to get the slot for.</param>
 <returns>
 	The true array slot for this value.
@@ -136,10 +228,10 @@ Compile options:
 </remarks>
 \**--------------------------------------------------------------------------**/
 
-#define Bit_Slot(%1) ((_:%1)>>>CELLSHIFT)
+#define BitArray_Slot(%1) ((_:%1)>>>CELLSHIFT)
 
 /**--------------------------------------------------------------------------**\
-<summary>Bit_Size</summary>
+<summary>BitArray_Size</summary>
 <param name="Bit:array[]">Array of bits.</param>
 <returns>
 	Size of the bit array
@@ -149,10 +241,10 @@ Compile options:
 </remarks>
 \**--------------------------------------------------------------------------**/
 
-#define Bit_Size(%1) (sizeof(%1)*cellbits)
+#define BitArray_Size(%1) (sizeof(%1)*cellbits)
 
 /**--------------------------------------------------------------------------**\
-<summary>Bit_Get</summary>
+<summary>BitArray_Get</summary>
 <param name="Bit:array[]">Array of bits.</param>
 <param name="slot">Bit slot.</param>
 <returns>
@@ -163,10 +255,10 @@ Compile options:
 </remarks>
 \**--------------------------------------------------------------------------**/
 
-#define Bit_Get(%1,%2) (%1[Bit_Slot(%2)]&Bit:(1<<((%2)&cellbits-1)))
+#define BitArray_Get(%1,%2) (Bit_Get(%1[BitArray_Slot(%2)],(%2-BitArray_Slot(%2)*cellbits))
 
 /**--------------------------------------------------------------------------**\
-<summary>Bit_Set</summary>
+<summary>BitArray_Set</summary>
 <param name="Bit:array[]">Array of bits.</param>
 <param name="slot">Bit slot.</param>
 <param name="bool:state">State to set the slot to.</param>
@@ -178,10 +270,10 @@ Compile options:
 </remarks>
 \**--------------------------------------------------------------------------**/
 
-#define Bit_Set(%0,%1,%2) ((%2)?(Bit_On(%0,(%1))):(Bit_Of(%0,(%1))))
+#define BitArray_Set(%1,%2,%3) (Bit_Set(%1[BitArray_Slot(%2)],(%2-BitArray_Slot(%2)*cellbits,%3))
 
 /**--------------------------------------------------------------------------**\
-<summary>Bit_SetAll</summary>
+<summary>BitArray_SetAll</summary>
 <param name="Bit:array[]">Array to set all values of.</param>
 <param name="bool:state">Wether to set them all 0 or 1.</param>
 <returns>
@@ -192,10 +284,10 @@ Compile options:
 </remarks>
 \**--------------------------------------------------------------------------**/
 
-#define Bit_SetAll(%1,%2) (memset(_:%1, ((%2) ? (0xFFFFFFFF) : (0x0)), size))
+#define BitArray_SetAll(%1,%2) (memset(_:%1, ((%2) ? (0xFFFFFFFF) : (0x0)), size))
 
 /**--------------------------------------------------------------------------**\
-<summary>Bit_On</summary>
+<summary>BitArray_On</summary>
 <param name="Bit:array[]">Array of bits.</param>
 <param name="slot">Bit slot.</param>
 <returns>
@@ -206,10 +298,10 @@ Compile options:
 </remarks>
 \**--------------------------------------------------------------------------**/
 
-#define Bit_On(%1,%2) %1[Bit_Slot(%2)]|=Bit:(1<<((%2)&cellbits-1))
+#define BitArray_On(%1,%2) (Bit_On(%1[BitArray_Slot(%2)],(%2-BitArray_Slot(%2)*cellbits))
 
 /**--------------------------------------------------------------------------**\
-<summary>Bit_Off</summary>
+<summary>BitArray_Off</summary>
 <param name="Bit:array[]">Array of bits.</param>
 <param name="slot">Bit slot.</param>
 <returns>
@@ -220,10 +312,24 @@ Compile options:
 </remarks>
 \**--------------------------------------------------------------------------**/
 
-#define Bit_Off(%1,%2) %1[Bit_Slot(%2)]&=Bit:~(1<<((%2)&cellbits-1))
+#define BitArray_Off(%1,%2) (Bit_Off(%1[BitArray_Slot(%2)],(%2-BitArray_Slot(%2)*cellbits))
 
 /**--------------------------------------------------------------------------**\
-<summary>Bit_Count</summary>
+<summary>BitArray_Toggle</summary>
+<param name="Bit:array[]">Array of bits.</param>
+<param name="slot">Bit slot.</param>
+<returns>
+	-
+</returns>
+<remarks>
+	Sets the slot to 0.
+</remarks>
+\**--------------------------------------------------------------------------**/
+
+#define BitArray_Toggle(%1,%2) (Bit_Toggle(%1[BitArray_Slot(%2)],(%2-BitArray_Slot(%2)*cellbits))
+
+/**--------------------------------------------------------------------------**\
+<summary>BitArray_Count</summary>
 <param name="Bit:array[]">Array to count.</param>
 <param name="size">Size of array.</param>
 <returns>
@@ -235,19 +341,7 @@ Compile options:
 </remarks>
 \**--------------------------------------------------------------------------**/
 
-stock Bit_Count(Bit:array[])
-{
-	new
-		count,
-		size = Bit_Size(array);
-	for (new rl@bitarray@@itter = 0; rl@bitarray@@itter < size; i++)
-	{
-		array[Bit_Slot(rl@bitarray@@itter)] -= ((array[Bit_Slot(rl@bitarray@@itter)] >>> 1) & 0x55555555);
-		array[Bit_Slot(rl@bitarray@@itter)] = (array[Bit_Slot(rl@bitarray@@itter)] & 0x33333333) + ((array[Bit_Slot(i)] >>> 2) & 0x33333333);
-		count += (((array[Bit_Slot(rl@bitarray@@itter)] + (array[Bit_Slot(rl@bitarray@@itter)] >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
-	}
-	return count;
-}
+native BitArray_Count(Bit:array[]);
 
 /*
  */

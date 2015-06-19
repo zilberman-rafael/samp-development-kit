@@ -42,12 +42,6 @@ Changelog:
 
 #include "printf.h"
 
-#define _RLS_LOGPRINTF_BUF_SIZE 1024
-
-#ifdef _MSC_VER
-  #define vsnprintf vsprintf_s
-#endif
-
 typedef void (RLS_CDECL *printf_t)(const char *format, ...);
 
 /* Gets called before the library is initialized. */
@@ -62,10 +56,7 @@ static void _rls_printf_stub(const char *format, ...) {
 void *_rls_printf_impl = &_sampgdk_printf_stub;
 
 void rls_printf(const char *format, ...) {
-  char buffer[_SAMPGDK_LOGPRINTF_BUF_SIZE];
   va_list va;
   va_start(va, format);
-  vsnprintf(buffer, sizeof(buffer), format, va);
-  buffer[sizeof(buffer) - 1] = '\0';
-  ((logprintf_t)_rls_printf_impl)("%s", buffer);
+  ((logprintf_t)_rls_printf_impl)(format, va);
 }

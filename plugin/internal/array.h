@@ -53,7 +53,6 @@ void rls_array_dispose(struct rls_array *a);
 int rls_array_resize(struct rls_array *a, int new_capacity);
 int rls_array_grow(struct rls_array *a);
 int rls_array_shrink(struct rls_array *a);
-int rls_array_pad(struct rls_array *a);
 
 void *rls_array_get(struct rls_array *a, int index);
 void rls_array_set(struct rls_array *a,int index, void *elem);

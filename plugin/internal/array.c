@@ -48,12 +48,6 @@ static void *_rls_array_get_elem_ptr(struct rls_array *a,
 
 static int _rls_array_normalize_index(struct rls_array *a,
                                           int index) {
-  /*
-   * if(index < 0)
-   *  return a->count + index; (1*a->count + index)
-   * else
-   *  return index; (0*a->count + index)
-   */
   return (index < 0)*a->count + index;
 }
 
@@ -130,18 +124,6 @@ int rls_array_shrink(struct rls_array *a) {
   return rls_array_resize(a, a->count);
 }
 
-int rls_array_pad(struct rls_array *a) {
-  int space;
-
-  assert(a != NULL);
-
-  if ((space = a->capacity - a->count) <= 0) {
-    return -EBADRQC;
-  }
-
-  return (a->count = a->capacity);
-}
-
 void *rls_array_get(struct rls_array *a, int index) {
   assert(a != NULL);
 
@@ -154,17 +136,14 @@ void *rls_array_get(struct rls_array *a, int index) {
 void rls_array_set(struct rls_array *a, int index, void *elem) {
   assert(a != NULL);
 
-  index = _rls_array_normalize_index(a, index);
-  assert(index < a->count);
-
-  memcpy(_rls_array_get_elem_ptr(a, index), elem, a->data_size);
+  memcpy(rls_array_get(a, index), elem, a->data_size);
 }
 
 int rls_array_insert(struct rls_array *a,
                          int index,
                          int count,
                          void *elems) {
-  int need_count;
+  int need_capacity;
   int move_count;
 
   assert(a != NULL);
@@ -177,13 +156,13 @@ int rls_array_insert(struct rls_array *a,
   index = _rls_array_normalize_index(a, index);
   assert(index <= a->count);
 
-  need_count = a->count + count - a->capacity;
+  need_capacity = a->count + count;
   move_count = a->count - index;
 
-  if (need_count > 0) {
+  if (need_capacity > a->capacity) {
     int error;
 
-    if ((error = rls_array_resize(a, a->capacity + need_count)) < 0) {
+    if ((error = rls_array_resize(a, need_capacity)) < 0) {
       return error;
     }
   }
@@ -212,10 +191,7 @@ int rls_array_append(struct rls_array *a, void *elem) {
     }
   }
 
-  a->count++;
-  rls_array_set(a, a->count - 1, elem);
-
-  return a->count - 1;
+  return rls_array_insert(a, a->count - 1, 1, elem);
 }
 
 int rls_array_remove(struct rls_array *a, int index, int count) {
@@ -278,19 +254,15 @@ int rls_array_find(struct rls_array *a,
 int rls_array_find_remove(struct rls_array *a,
                               const void *key,
                               rls_array_cmp cmp) {
-  int index;
-  void *cur;
+  int error;
 
   assert(a != NULL);
   assert(cmp != NULL);
-
-  for (index = 0; index < a->count; index++) {
-    cur = rls_array_get(a, index);
-    if (cmp(key, cur) == 0) {
-      rls_array_remove(a, index, 1);
-      return index;
-    }
+  
+  if((error = rls_array_find(a, key, cmp)) >= 0)
+  {
+      rls_array_remove(a, error, 1);
   }
 
-  return -EINVAL;
+  return error;
 }
