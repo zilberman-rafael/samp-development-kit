@@ -1,78 +1,46 @@
-/*
-*	Description:
-*		Provides functions for bit manipulation and bit arrays greater than 32bits.
-*		The arrays are usually bigger than required due to cell boundaries but this
-*		shouldn't cause a major problem (bit tests on the 101st bit of a 100 bit
-*		array won't return 0 for out of bounds, but the 129th will).
-*
-*		Note that y_commands has a few optimisations which bypass the code in here
-*		so any modifications to bit array layouts will need to be reflected there.
-*/
+/**--------------------------------------------------------------------------**\
+Author:
+  Zeex, Zilberman Rafael from SA-MP.co.il
+  
+Legal:
+	This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	
+Contributors:
+		Agresiv, Zeex
+	
+Special thanks to:
+		Amit_B - ...
+    Zexx - ...
+	
+Version:
+	0.1
+  
+Changelog:
+	17/06/2014:
+		First version.
+\**--------------------------------------------------------------------------**/
 
-#include <stdlib.h>
-#include <string.h>
-#include "logprintf.h"
+#ifndef _RLS_@INTERNAL_@@LOG_H
+#define _RLS_@INTERNAL_@@LOG_H
 
-#ifndef RLS_INTERNAL_LOG
-#define RLS_INTERNAL_LOG
+void rls_log_status_enable(int status);
+void rls_log_status_disable(int status);
 
-/* disclaimer log functions */
-char* rls_log_debug(char *format);
+void rls_log_debug(const char *format, ...);
 void rls_log_info(const char *format, ...);
 void rls_log_warning(const char *format, ...);
 void rls_log_error(const char *format, ...);
+void rls_log_error_code(int error_code, const char *format, ...);
 
-typedef enum { RLS_DEBUG, RLS_INFO, RLS_ERROR, RLS_WARNING } status; /* rls log printing situations */
-static void rls_log_printf(status s, const char *format, va_list args) { /* main function are report data were */
-	char *szString = "";
-	char *szStatus = "";
-	switch (s) {
-	case RLS_DEBUG:
-		szStatus = "[rls_Debug]: ";
-		break;
-	case RLS_ERROR:
-		szStatus = "[rls_Error]: ";
-		break;
-	case RLS_INFO:
-		szStatus = "[rls_Info]: ";
-		break;
-	case RLS_WARNING:
-		szStatus = "[rls_Warning]: ";
-		break;
-	}
-	szString = (char*)malloc(sizeof("[rls_Warning]: ") - 1 + strlen(szStatus) + strlen(format) + 1);
-	strcpy(szString, szStatus);
-	strcat(szString, format);
-	rls_logprintf(szString, args);
-	free(szString);
-}
-
-void rls_log_debug(const char *format, ...) {
-	va_list args;
-	va_start(args, format);
-	rls_log_printf(RLS_DEBUG, format, args);
-	va_end(args);
-}
-
-void rls_log_info(const char* format, ...) {
-	va_list args;
-	va_start(args, format);
-	rls_log_printf(RLS_INFO, format, args);
-	va_end(args);
-}
-
-void rls_log_warning(const char* format, ...) {
-	va_list args;
-	va_start(args, format);
-	rls_log_printf(RLS_WARNING, format, args);
-	va_end(args);
-}
-
-void rls_log_error(const char* format, ...) {
-	va_list args;
-	va_start(args, format);
-	rls_log_printf(RLS_ERROR, format, args);
-	va_end(args);
-}
-
-#endif /* !RLS_INTERNAL_LOG */
+#endif /* !_RLS_@INTERNAL_@@LOG_H */

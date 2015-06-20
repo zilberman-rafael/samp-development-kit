@@ -31,20 +31,9 @@ Changelog:
 		First version.
 \**--------------------------------------------------------------------------**/
 
-int rls_log_init(void);
+#ifndef _RLS_@COMMAND_H
+#define _RLS_@COMMAND_H
 
-int rls_module_init(void) {
-  int error;
-  
-  if ((error = rls_log_init()) < 0) {
-    return error;
-  }
-  
-  return 0;
-}
+void rls_command_register_amx(AMX *amx);
 
-void rls_log_cleanup(void);
-
-void rls_module_cleanup(void) {
-  rls_log_cleanup();
-}
+#endif /* !_RLS_@COMMAND_H */

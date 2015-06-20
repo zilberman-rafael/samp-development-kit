@@ -1,8 +1,7 @@
 /**--------------------------------------------------------------------------**\
 Author:
   Zeex, Zilberman Rafael from SA-MP.co.il
-Description:
-	-
+  
 Legal:
 	This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -17,21 +16,19 @@ Legal:
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	
-	Contributors:
+Contributors:
 		Agresiv, Zeex
 	
-	Very special thanks to:
+Special thanks to:
 		Amit_B - ...
     Zexx - ...
 	
 Version:
 	0.1
+  
 Changelog:
 	17/06/2014:
 		First version.
-<remarks>
-  Internal usage only.
-</remarks>
 \**--------------------------------------------------------------------------**/
 
 #include <stdarg.h>
